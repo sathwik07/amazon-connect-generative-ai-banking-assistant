@@ -1,80 +1,79 @@
 # Banking Virtual Assistant using Amazon Connect
+
 ![Run Python Tests](https://github.com/sathwik07/amazon-connect-generative-ai-banking-assistant/actions/workflows/tests.yml/badge.svg)
 
 ## About
 
-This project is a Python-based banking virtual assistant. It handles basic customer queries such as account balance, recent transactions, account information, and general banking questions.
+This project is a Python-based banking virtual assistant. It handles common customer questions such as account balance, recent transactions, account information, and general banking queries.
 
-The application uses separate Python services for banking operations, authentication, conversation handling, and customer interaction. The project also includes handler examples for Amazon Connect and Amazon Lex V2.
+The application is organized into separate Python services for banking operations, authentication, conversation handling, and customer interaction. It also includes sample handlers for Amazon Connect and Amazon Lex V2.
 
-## What it does
+## Features
 
-- Handles account balance and transaction inquiries.
-- Maintains sample customer account information.
-- Provides a basic OTP verification flow.
-- Identifies common banking requests through keyword-based intent handling.
-- Retrieves answers from a small banking knowledge base.
-- Includes a separate handler for Amazon Connect contact events.
-- Includes an Amazon Lex V2 handler example.
+- Account balance inquiries using sample customer records.
+- Recent transaction history.
+- Basic account information lookup.
+- Demo OTP generation and verification.
+- Keyword-based intent detection for common banking requests.
+- Banking FAQ responses using a local knowledge base.
+- FastAPI endpoints for health checks and chat requests.
+- Sample Amazon Connect and Amazon Lex event handlers.
+- Automated tests using pytest and GitHub Actions.
 
 ## Technologies
 
 - Python
+- FastAPI
 - Amazon Connect
 - Amazon Lex V2
-- Amazon Bedrock
+- Amazon Bedrock (planned integration)
 - AWS Lambda
-- FastAPI
+- pytest
+- GitHub Actions
 - Git and GitHub
 
 ## Project Structure
 
 ```text
-app/
-    services/
-        authentication_service.py
-        banking_service.py
-        bedrock_service.py
-        connect_service.py
-        conversation_service.py
-        knowledge_base.py
-
-lambda/
-    __init__.py
-    connect_handler.py
-    lex_handler.py
-
-main.py
-requirements.txt
-README.md
+amazon-connect-generative-ai-banking-assistant/
+│
+├── app/
+│   ├── services/
+│   │   ├── __init__.py
+│   │   ├── authentication_service.py
+│   │   ├── banking_service.py
+│   │   ├── bedrock_service.py
+│   │   ├── connect_service.py
+│   │   ├── conversation_service.py
+│   │   ├── knowledge_base.py
+│   │   └── lex_service.py
+│   │
+│   ├── __init__.py
+│   └── api.py
+│
+├── lambda/
+│   ├── __init__.py
+│   ├── connect_handler.py
+│   └── lex_handler.py
+│
+├── tests/
+│   ├── test_authentication_service.py
+│   ├── test_banking_service.py
+│   ├── test_conversation_service.py
+│   ├── test_banking_service.py
+│   └── test_api.py
+│
+├── .github/
+│   └── workflows/
+│       └── tests.yml
+│
+├── main.py
+├── requirements.txt
+├── README.md
+└── LICENSE
 ```
 
-## How the application works
-
-A customer submits a banking-related question. The conversation service identifies the request and calls the banking service when account information is needed.
-
-For general questions, the application checks its banking knowledge base and returns a matching response.
-
-The authentication service contains a basic OTP verification flow. Separate handler modules demonstrate how the application can be connected to Amazon Connect and Amazon Lex V2.
-
-## Running the project
-
-The Python application is being developed with sample customer records and local service implementations.
-
-AWS credentials and live service configuration are not included in this repository. The Amazon Connect, Lex V2, and Bedrock components require additional integration and testing before live deployment.
-
-## Current Scope
-
-This is a demonstration project using mock banking data. It does not connect to real customer accounts or process actual banking transactions.
-
-## Future Work
-
-- Add live Amazon Bedrock model integration.
-- Configure Amazon Lex V2 intents and fulfillment.
-- Connect Amazon Connect contact flows with Lambda.
-- Add automated tests for banking and authentication services.
-- Improve conversation logging and error handling.
-- ## Application Architecture
+## Application Architecture
 
 The application is organized into separate services:
 
@@ -84,20 +83,106 @@ The application is organized into separate services:
 - **Knowledge Base:** Stores common banking questions and answers.
 - **Bedrock Service:** Performs local FAQ matching as a placeholder for future Bedrock integration.
 - **Connect Service:** Handles sample contact events and chat messages.
+- **Lex Service:** Identifies common banking intents using keyword matching.
 - **Lambda Handlers:** Provide example entry points for Connect and Lex-style events.
 
-GitHub Actions runs the automated tests whenever changes are pushed to the main branch.
+### Architecture Diagram
+
+```mermaid
+flowchart TD
+    A[Customer] --> B[FastAPI]
+    B --> C[Conversation Service]
+    C --> D[Authentication Service]
+    C --> E[Banking Service]
+    C --> F[Knowledge Base]
+    F --> G[Bedrock Placeholder]
+    H[Amazon Connect Handler] --> C
+    I[Lex Handler] --> J[Lex Intent Service]
+    K[GitHub Actions] --> L[Automated Tests]
+```
+
+## How the Application Works
+
+A customer submits a banking-related question through the application.
+
+The conversation service processes the message and identifies the request. For account-related questions, it uses the banking service to retrieve information from sample customer records.
+
+The authentication service contains a basic OTP generation and verification flow. General banking questions are matched against the local knowledge base.
+
+The Connect and Lex handler files provide sample entry points for processing contact and intent events.
+
+The current Bedrock service uses local FAQ matching. It does not make live Amazon Bedrock API calls.
+
 ## API Usage
 
 The project includes a FastAPI interface for sending banking questions.
 
-### Endpoints
+### Available Endpoints
 
-- `GET /health` – Checks whether the API is running.
-- `POST /chat` – Accepts a customer message and returns the assistant response.
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/health` | Checks whether the API is running |
+| POST | `/chat` | Accepts a customer message and returns an assistant response |
 
-### Run locally
+### API Documentation
+
+FastAPI provides interactive API documentation when the application is running.
+
+```text
+http://127.0.0.1:8000/docs
+```
+
+## Running Locally
+
+Install the project dependencies:
 
 ```bash
 pip install -r requirements.txt
+```
+
+Start the FastAPI application:
+
+```bash
 uvicorn app.api:app --reload
+```
+
+Open the API documentation in your browser:
+
+```text
+http://127.0.0.1:8000/docs
+```
+
+The command-line assistant can also be started using:
+
+```bash
+python main.py
+```
+
+## Testing
+
+The project uses pytest for automated testing.
+
+Run the tests using:
+
+```bash
+pytest -v
+```
+
+GitHub Actions runs the automated test suite whenever changes are pushed to the main branch.
+
+## Current Scope and Limitations
+
+- Uses sample banking data and does not connect to real customer accounts.
+- OTP verification is a basic demonstration and is not production-grade authentication.
+- The Bedrock service currently performs local FAQ matching instead of calling an AWS model.
+- Amazon Connect and Lex handlers are sample implementations and have not been connected to live AWS resources.
+- No actual banking transactions are processed.
+
+## Future Improvements
+
+- Integrate Amazon Bedrock for AI-generated banking responses.
+- Configure Amazon Lex V2 intents and fulfillment.
+- Connect Amazon Connect contact flows with AWS Lambda.
+- Add secure authentication and session management.
+- Expand automated testing and error handling.
+- Add a retrieval-based knowledge system for banking FAQs.
