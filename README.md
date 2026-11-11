@@ -73,3 +73,16 @@ This is a demonstration project using mock banking data. It does not connect to 
 - Connect Amazon Connect contact flows with Lambda.
 - Add automated tests for banking and authentication services.
 - Improve conversation logging and error handling.
+- ## Application Architecture
+
+The application is organized into separate services:
+
+- **Conversation Service:** Handles customer messages and manages the conversation flow.
+- **Banking Service:** Provides sample account details, balance information, and transaction history.
+- **Authentication Service:** Generates and verifies demo OTPs.
+- **Knowledge Base:** Stores common banking questions and answers.
+- **Bedrock Service:** Performs local FAQ matching as a placeholder for future Bedrock integration.
+- **Connect Service:** Handles sample contact events and chat messages.
+- **Lambda Handlers:** Provide example entry points for Connect and Lex-style events.
+
+GitHub Actions runs the automated tests whenever changes are pushed to the main branch.
