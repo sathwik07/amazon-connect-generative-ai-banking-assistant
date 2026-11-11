@@ -87,3 +87,17 @@ The application is organized into separate services:
 - **Lambda Handlers:** Provide example entry points for Connect and Lex-style events.
 
 GitHub Actions runs the automated tests whenever changes are pushed to the main branch.
+## API Usage
+
+The project includes a FastAPI interface for sending banking questions.
+
+### Endpoints
+
+- `GET /health` – Checks whether the API is running.
+- `POST /chat` – Accepts a customer message and returns the assistant response.
+
+### Run locally
+
+```bash
+pip install -r requirements.txt
+uvicorn app.api:app --reload
