@@ -60,7 +60,6 @@ amazon-connect-generative-ai-banking-assistant/
 │   ├── test_authentication_service.py
 │   ├── test_banking_service.py
 │   ├── test_conversation_service.py
-│   ├── test_banking_service.py
 │   └── test_api.py
 │
 ├── .github/
@@ -86,7 +85,8 @@ The application is organized into separate services:
 - **Lex Service:** Identifies common banking intents using keyword matching.
 - **Lambda Handlers:** Provide example entry points for Connect and Lex-style events.
 
-### Architecture Diagram
+
+## Architecture Diagram
 
 ```mermaid
 flowchart TD
