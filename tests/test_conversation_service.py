@@ -20,7 +20,7 @@ def test_balance_after_otp_verification():
 
     response = assistant.get_response(otp)
 
-    assert "12500.75" in response
+    assert "12,500.75" in response
 
 
 def test_invalid_otp_does_not_show_balance():
