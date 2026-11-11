@@ -1,40 +1,36 @@
+from app.services.bedrock_service import BedrockService
+from app.services.knowledge_base import get_knowledge_base
+
 
 class ConversationService:
     def __init__(self, banking_service):
         self.banking_service = banking_service
         self.pending_intent = None
+        self.bedrock = BedrockService(get_knowledge_base())
 
     def get_response(self, message):
         message = message.lower().strip()
 
         if self.pending_intent:
-            account_number = message
-
-            if not account_number.isdigit() or len(account_number) != 4:
-                return "Please enter a valid 4-digit account number."
+            if not message.isdigit() or len(message) != 4:
+                return "Please enter a valid 4-digit demo account number."
 
             intent = self.pending_intent
             self.pending_intent = None
+            return self._process_request(intent, message)
 
-            return self._process_request(intent, account_number)
-
-        if any(word in message for word in ["balance", "amount", "money"]):
+        if any(word in message for word in ["balance", "amount"]):
             intent = "balance"
-
-        elif any(word in message for word in ["transaction", "transactions", "payment"]):
+        elif any(word in message for word in ["transaction", "payment"]):
             intent = "transactions"
-
         elif any(word in message for word in ["account", "customer"]):
             intent = "account"
-
         else:
-            return (
-                "I can help with account details, balance inquiries, "
-                "and recent transactions. What would you like to know?"
-            )
+            return self.bedrock.generate_response(message)
 
         account_number = next(
-            (word for word in message.split() if word.isdigit() and len(word) == 4),
+            (word for word in message.split()
+             if word.isdigit() and len(word) == 4),
             None
         )
 
@@ -48,7 +44,7 @@ class ConversationService:
         account = self.banking_service.get_account(account_number)
 
         if not account:
-            return "I couldn't find an account with that number."
+            return "Account not found. Please check the account number."
 
         if intent == "balance":
             balance = self.banking_service.get_balance(account_number)
@@ -68,7 +64,7 @@ class ConversationService:
                 for item in transactions
             ]
 
-            return "Here are your recent transactions:\n" + "\n".join(details)
+            return "Recent transactions:\n" + "\n".join(details)
 
         return (
             f"Account holder: {account['name']}\n"
