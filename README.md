@@ -1,4 +1,5 @@
 # Banking Virtual Assistant using Amazon Connect
+![Run Python Tests](https://github.com/sathwik07/amazon-connect-generative-ai-banking-assistant/actions/workflows/tests.yml/badge.svg)
 
 ## About
 
