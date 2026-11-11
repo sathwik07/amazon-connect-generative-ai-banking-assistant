@@ -1,23 +1,34 @@
 from app.services.bedrock_service import BedrockService
 from app.services.knowledge_base import get_knowledge_base
+from app.services.authentication_service import AuthenticationService
 
 
 class ConversationService:
     def __init__(self, banking_service):
         self.banking_service = banking_service
+        self.authentication = AuthenticationService()
         self.pending_intent = None
+        self.pending_account_number = None
         self.bedrock = BedrockService(get_knowledge_base())
 
     def get_response(self, message):
-        message = message.lower().strip()
+        message = message.strip()
 
-        if self.pending_intent:
-            if not message.isdigit() or len(message) != 4:
-                return "Please enter a valid 4-digit demo account number."
+        if self.pending_account_number:
+            if not self.authentication.verify_otp(
+                self.pending_account_number, message
+            ):
+                return "Invalid OTP. Please try again."
 
+            account_number = self.pending_account_number
             intent = self.pending_intent
+
+            self.pending_account_number = None
             self.pending_intent = None
-            return self._process_request(intent, message)
+
+            return self._process_request(intent, account_number)
+
+        message = message.lower()
 
         if any(word in message for word in ["balance", "amount"]):
             intent = "balance"
@@ -38,7 +49,23 @@ class ConversationService:
             self.pending_intent = intent
             return "Please enter your 4-digit demo account number."
 
-        return self._process_request(intent, account_number)
+        return self._start_authentication(intent, account_number)
+
+    def _start_authentication(self, intent, account_number):
+        account = self.banking_service.get_account(account_number)
+
+        if not account:
+            return "Account not found. Please check the account number."
+
+        self.pending_intent = intent
+        self.pending_account_number = account_number
+
+        otp = self.authentication.generate_otp(account_number)
+
+        return (
+            "Demo OTP verification required.\n"
+            f"Your test OTP is: {otp}"
+        )
 
     def _process_request(self, intent, account_number):
         account = self.banking_service.get_account(account_number)
